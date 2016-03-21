@@ -78,6 +78,7 @@ public class PlayScreen implements Screen{
 
 
         box2DDebugRenderer.SHAPE_STATIC.add(Color.BLUE);
+        System.out.println("Lol");
 
 
 
