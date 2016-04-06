@@ -52,25 +52,21 @@ public class FieldContainer extends Sprite{
 
         // 1. Create a BodyDef, as usual.
         BodyDef bdefLeftContainer = new BodyDef();
-        bdefLeftContainer.position.set(100/FHGame.PPM,150/ FHGame.PPM );
+        bdefLeftContainer.position.set(80/FHGame.PPM,163/ FHGame.PPM );
         bdefLeftContainer.type = BodyDef.BodyType.StaticBody;
 
         BodyDef bdefRightContainer = new BodyDef();
-        bdefRightContainer.position.set(500/FHGame.PPM,150/ FHGame.PPM );
+        bdefRightContainer.position.set(520/FHGame.PPM,163/ FHGame.PPM );
         bdefRightContainer.type = BodyDef.BodyType.StaticBody;
 
 
         // 2. Create a FixtureDef, as usual.
         FixtureDef fdLeftContainer = new FixtureDef();
 
-        fdLeftContainer.density = 1;
-        fdLeftContainer.friction = 0.5f;
-        fdLeftContainer.restitution = 0.3f;
+
 
         FixtureDef fdRightContainer = new FixtureDef();
-        fdRightContainer.density = 1;
-        fdRightContainer.friction = 0.5f;
-        fdRightContainer.restitution = 0.3f;
+
 
 
 
@@ -93,7 +89,7 @@ public class FieldContainer extends Sprite{
 
         //setPosition(40/FHGame.PPM, 40/FHGame.PPM);
         setPosition(bodyLeftContainer.getPosition().x-(32.5f/2)/FHGame.PPM, bodyLeftContainer.getPosition().y-(30f/2)/FHGame.PPM);
-        setPosition(bodyRightContainer.getPosition().x-(32.5f/2)/FHGame.PPM, bodyRightContainer.getPosition().y-(30f/2)/FHGame.PPM);
+//        setPosition(bodyRightContainer.getPosition().x-(32.5f/2)/FHGame.PPM, bodyRightContainer.getPosition().y-(30f/2)/FHGame.PPM);
        //setOrigin(bottleModelOrigin.x, bottleModelOrigin.y);
     }
 }

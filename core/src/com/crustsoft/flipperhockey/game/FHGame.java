@@ -18,7 +18,15 @@ public class FHGame extends Game {
 	public static final int V_HEIGHT=1140;
 	public static final int SCALE=2;
 	public static final float STEP = 1 / 60f;
+	// pixels per meter
 	public static final float PPM = 100;
+
+	// collision bit filters
+	public static final short BIT_GOAL_BOT = 2;
+	public static final short BIT_GOAL_TOP = 4;
+	public static final short BIT_PUCK= 8;
+	public static final short BIT_CONTAINER= 16;
+	public static final short BIT_FLIPPER= 32;
 
 
 
