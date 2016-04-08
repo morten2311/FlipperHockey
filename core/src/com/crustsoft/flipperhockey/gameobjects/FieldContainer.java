@@ -68,7 +68,11 @@ public class FieldContainer extends Sprite{
         FixtureDef fdRightContainer = new FixtureDef();
 
 
+        fdLeftContainer.filter.categoryBits=FHGame.BIT_CONTAINER;
+        fdRightContainer.filter.categoryBits=FHGame.BIT_CONTAINER;
 
+        fdLeftContainer.filter.maskBits=FHGame.BIT_PUCK;
+        fdRightContainer.filter.maskBits=FHGame.BIT_PUCK;
 
         // 3. Create a Body, as usual.
         Body bodyRightContainer = world.createBody(bdefRightContainer);

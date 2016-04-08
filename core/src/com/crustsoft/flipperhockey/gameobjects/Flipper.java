@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -44,8 +46,8 @@ public class Flipper {
         this.lowerAngle = lowerAngle;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.density=10f;
-        this.maxMotorTorque=400;
+        this.density=5f;
+        this.maxMotorTorque=140;
         this.motorSpeed=motorSpeed;
         if(left){
             flipperLength=114;
@@ -59,7 +61,7 @@ public class Flipper {
 
     public void defineFlipper() {
 
-        //Main body
+        //Flipper body
         BodyDef bdefFlipper = new BodyDef();
         bdefFlipper.type = BodyDef.BodyType.DynamicBody;
         bdefFlipper.position.set(xPos / FHGame.PPM, yPos / FHGame.PPM);
@@ -73,15 +75,11 @@ public class Flipper {
         BodyDef bdefStartC = new BodyDef();
         bdefStartC.position.set(xPos / FHGame.PPM, yPos / FHGame.PPM);
         bdefStartC.type = BodyDef.BodyType.StaticBody;
-
         FixtureDef fDefStartC = new FixtureDef();
         fDefStartC.shape = circleStart;
-
         bodyStartC = world.createBody(bdefStartC);
-
         bodyStartC.createFixture(fDefStartC);
         circleStart.dispose();
-
 
         //CircleEnd
         CircleShape circleEnd = new CircleShape();
@@ -90,33 +88,33 @@ public class Flipper {
         FixtureDef fDefEndC = new FixtureDef();
         fDefEndC.shape = circleEnd;
 
-
-
         //Polygon
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.set(vertices);
-
         FixtureDef fDefPoly = new FixtureDef();
         fDefPoly.shape = polygonShape;
         bodyFlipper.createFixture(fDefPoly);
-
         fDefPoly.density = density;
-
-
-
+        //Create fixtures
         bodyFlipper.createFixture(fDefEndC);
         bodyFlipper.createFixture(fDefPoly);
+        //Set filter
+        for(Fixture fixture: bodyFlipper.getFixtureList()){
+            Filter filter = fixture.getFilterData();
+            filter.categoryBits=FHGame.BIT_FLIPPER;
+            filter.maskBits=FHGame.BIT_PUCK;
+            fixture.setFilterData(filter);
+
+        }
+
+        //dispose
         polygonShape.dispose();
         circleEnd.dispose();
 
-
+        //Create joint
         RevoluteJointDef revoluteJointDef = new RevoluteJointDef();
         revoluteJointDef.initialize(bodyStartC, bodyFlipper, new Vector2(xPos / FHGame.PPM, yPos / FHGame.PPM));
-
         revoluteJointDef.collideConnected = false;
-
-
-
 
         revoluteJointDef.enableLimit = true;
         revoluteJointDef.upperAngle = upperAngle * MathUtils.degreesToRadians;

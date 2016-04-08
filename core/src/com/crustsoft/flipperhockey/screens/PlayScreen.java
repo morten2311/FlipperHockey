@@ -12,7 +12,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.crustsoft.flipperhockey.game.FHGame;
 import com.crustsoft.flipperhockey.gameobjects.FieldContainer;
@@ -41,7 +45,7 @@ public class PlayScreen implements Screen {
     private FlipperRight flipperRightBottom, flipperRightTop;
     private Puck puck;
     private FieldContainer fieldContainer;
-    Rectangle rectangle;
+    Rectangle rectangle,rectangle2;
     ShapeRenderer shapeRenderer;
     private SpriteBatch spriteBatch;
 
@@ -49,6 +53,7 @@ public class PlayScreen implements Screen {
 
 
     public PlayScreen(FHGame fhGame) {
+        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
         this.fhGame = fhGame;
         world = new World(new Vector2(0, 0), true);
         spriteBatch = fhGame.spriteBatch;
@@ -56,16 +61,18 @@ public class PlayScreen implements Screen {
 
         this.camera = new OrthographicCamera();
 
-        viewport = new FitViewport(fhGame.V_WIDTH / FHGame.PPM, fhGame.V_HEIGHT / FHGame.PPM, camera);
+        viewport = new ExtendViewport(fhGame.V_WIDTH / FHGame.PPM, fhGame.V_HEIGHT / FHGame.PPM, camera);
+        //viewport.setScreenBounds(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+
         viewport.apply();
-        //camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
-        camera.setToOrtho(false, viewport.getWorldWidth(), viewport.getWorldHeight());
+        camera.position.set(FHGame.V_WIDTH / 2, FHGame.V_HEIGHT / 2, 0);
+      camera.setToOrtho(false, viewport.getWorldWidth(), viewport.getWorldHeight());
 
         inputHandler = new InputHandler(this);
         Gdx.input.setInputProcessor(inputHandler);
 
-        scoreLineSensorBottom = new ScoreLineSensor(this,false,360,100);
-        scoreLineSensorTop = new ScoreLineSensor(this,true,360,500);
+        scoreLineSensorBottom = new ScoreLineSensor(this,false,360,50);
+        scoreLineSensorTop = new ScoreLineSensor(this,true,360,1095);
        // scoreLineSensorTop= new ScoreLineSensor(this,true,400,800);
 
         flipperLeftBottom = new FlipperLeft(this, 195, 145, 20, -20, -2, true);
@@ -76,38 +83,34 @@ public class PlayScreen implements Screen {
 
         puck = new Puck(this);
         fieldContainer = new FieldContainer(this);
+
         rectangle = new Rectangle(40, 90, 640, 960);
+        rectangle2 = new Rectangle(0, 0, 720, 1140);
+
         shapeRenderer = new ShapeRenderer();
-        shapeRenderer.setProjectionMatrix(camera.combined);
-
-
         box2DDebugRenderer.SHAPE_STATIC.add(Color.BLUE);
-
         world.setContactListener(new B2DContactListener());
-
-
-
-
-    }
-
-    public void handleInput() {
 
 
     }
 
     @Override
-    public void show() {
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        camera.position.set((fhGame.V_WIDTH / FHGame.PPM)/2, (fhGame.V_HEIGHT / FHGame.PPM)/2,0);
 
     }
 
+
+
     public void update(float delta) {
-        handleInput();
         if (puck.bodyPuck.getPosition().y > (FHGame.V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, 5f));
+            world.setGravity(new Vector2(0, 4f));
 
         }
         if (puck.bodyPuck.getPosition().y < (FHGame.V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, -5f));
+            world.setGravity(new Vector2(0, -4f));
 
         }
         camera.update();
@@ -122,21 +125,25 @@ public class PlayScreen implements Screen {
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        shapeRenderer.setProjectionMatrix(camera.combined);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
+
+        shapeRenderer.setColor(Color.YELLOW);
+        shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
         shapeRenderer.setColor(Color.GRAY);
         shapeRenderer.rect(rectangle.getX() / FHGame.PPM, rectangle.getY() / FHGame.PPM, rectangle.getWidth() / FHGame.PPM, rectangle.getHeight() / FHGame.PPM);
-        shapeRenderer.setColor(Color.YELLOW);
-        shapeRenderer.rectLine(0 / FHGame.PPM, (FHGame.V_HEIGHT / 2) / FHGame.PPM, 720 / FHGame.PPM, (FHGame.V_HEIGHT / 2) / FHGame.PPM, 1 / FHGame.PPM);
         shapeRenderer.end();
 
 
-   /*     spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
         //spriteBatch.draw(fieldContainer.texture, 10 /FHGame.PPM, 10/FHGame.PPM,114/FHGame.PPM,814/FHGame.PPM);
         fieldContainer.draw(spriteBatch);
         spriteBatch.end();
-*/
+
 
         box2DDebugRenderer.render(world, camera.combined);
 
@@ -147,10 +154,7 @@ public class PlayScreen implements Screen {
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height);
-        // camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
-
+    public void show() {
 
     }
 

@@ -30,7 +30,7 @@ public class Puck   {
          bdefPuck = new BodyDef();
         bdefPuck.type= BodyDef.BodyType.DynamicBody;
         bdefPuck.bullet=true;
-        bdefPuck.position.set(380 / FHGame.PPM, 571 / FHGame.PPM);
+        bdefPuck.position.set(390 / FHGame.PPM, 571 / FHGame.PPM);
 
         CircleShape CirclePuck = new CircleShape();
         CirclePuck.setRadius((38f) / FHGame.PPM);
@@ -38,7 +38,7 @@ public class Puck   {
         FixtureDef fdefPuck = new FixtureDef();
 
         fdefPuck.shape=CirclePuck;
-        fdefPuck.density=1f;
+        fdefPuck.density=0.7f;
         fdefPuck.restitution=0.4f;
         fdefPuck.friction=0.0f;
         fdefPuck.filter.categoryBits= FHGame.BIT_PUCK;
@@ -46,11 +46,15 @@ public class Puck   {
 
 
         bodyPuck =world.createBody(bdefPuck);
-        bodyPuck.setFixedRotation(true);
-        bodyPuck.setLinearDamping(0.3f);
+       // bodyPuck.setFixedRotation(true);
+        bodyPuck.setLinearDamping(0.2f);
         bodyPuck.setUserData(this);
         bodyPuck.createFixture(fdefPuck);
 
+    }
+    public void resetPuck(){
+        world.destroyBody(bodyPuck);
+        definePuck();
     }
 
 

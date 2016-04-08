@@ -22,19 +22,19 @@ public class InputHandler implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         if(keycode== Input.Keys.RIGHT){
-            playScreen.getFlipperRightBottom().joint.setMotorSpeed(-30);
+            playScreen.getFlipperRightBottom().joint.setMotorSpeed(-20);
             return true;
         }
         if( keycode== Input.Keys.LEFT) {
-            playScreen.getFlipperLeftBottom().joint.setMotorSpeed(30);
+            playScreen.getFlipperLeftBottom().joint.setMotorSpeed(20);
             return true;
         }
         if( keycode== Input.Keys.D) {
-            playScreen.getFlipperRightTop().joint.setMotorSpeed(30);
+            playScreen.getFlipperRightTop().joint.setMotorSpeed(20);
             return true;
         }
         if( keycode== Input.Keys.A) {
-            playScreen.getFlipperLeftTop().joint.setMotorSpeed(-30);
+            playScreen.getFlipperLeftTop().joint.setMotorSpeed(-20);
             return true;
            }
 
@@ -63,6 +63,11 @@ public class InputHandler implements InputProcessor {
             playScreen.getFlipperLeftTop().joint.setMotorSpeed(30);
             return true;
         }
+        if( keycode== Input.Keys.SPACE) {
+            playScreen.getPuck().resetPuck();
+            return true;
+        }
+
 
 
         return false;

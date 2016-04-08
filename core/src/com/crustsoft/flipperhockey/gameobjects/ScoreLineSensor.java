@@ -38,7 +38,7 @@ public class ScoreLineSensor {
         bodyDef.type= BodyDef.BodyType.StaticBody;
         bodyDef.position.set(x / FHGame.PPM, y/FHGame.PPM);
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox((400/2)/FHGame.PPM,(100/2)/FHGame.PPM);
+        polygonShape.setAsBox((400/2)/FHGame.PPM,(50/2)/FHGame.PPM);
 
         FixtureDef fdefScoreLine = new FixtureDef();
         fdefScoreLine.shape=polygonShape;
