@@ -14,10 +14,10 @@ import com.crustsoft.flipperhockey.screens.PlayScreen;
 public class FHGame extends Game {
 
 	public static final String TITLE="Flipper Hockey";
+	public static final int LOGICAL_V_WIDTH =640;
+	public static final int LOGICAL_V_HEIGHT =960;
 	public static final int V_WIDTH=720;
 	public static final int V_HEIGHT=1140;
-	public static final int LOGICAL_V_WIDTH=640;
-	public static final int LOGICAL_V_HEIGHT=960;
 	public static final int SCALE=2;
 	public static final float STEP = 1 / 60f;
 	// pixels per meter

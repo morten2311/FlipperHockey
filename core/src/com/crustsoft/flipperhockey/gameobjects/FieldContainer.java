@@ -25,19 +25,14 @@ public class FieldContainer extends Sprite{
     public TextureRegion textureRegion,textureRegion1;
     public FieldContainer(PlayScreen playScreen) {
         world = playScreen.world;
-        texture = new Texture("fieldleft.png");
-        textureRegion= new TextureRegion(texture,0,0,297,1696);
 
-        texture1 = new Texture("fieldright.png");
-        textureRegion1= new TextureRegion(texture,0,0,297,1696);
 
-        setRegion(textureRegion);
         setBounds(0, 0, (297 / 2) / FHGame.PPM, (1696 / 2) / FHGame.PPM);
 
 
-
+/*
         setRegion(textureRegion1);
-        setBounds(0,0,(297/2)/FHGame.PPM,(1696/2)/FHGame.PPM);
+        setBounds(0,0,(297/2)/FHGame.PPM,(1696/2)/FHGame.PPM);*/
 
         createContainer();
 
@@ -51,12 +46,23 @@ public class FieldContainer extends Sprite{
         BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("container.json"));
 
         // 1. Create a BodyDef, as usual.
+/*
         BodyDef bdefLeftContainer = new BodyDef();
         bdefLeftContainer.position.set(80/FHGame.PPM,163/ FHGame.PPM );
         bdefLeftContainer.type = BodyDef.BodyType.StaticBody;
 
         BodyDef bdefRightContainer = new BodyDef();
         bdefRightContainer.position.set(520/FHGame.PPM,163/ FHGame.PPM );
+        bdefRightContainer.type = BodyDef.BodyType.StaticBody;
+*/
+
+
+        BodyDef bdefLeftContainer = new BodyDef();
+        bdefLeftContainer.position.set(40/FHGame.PPM,(163-90)/ FHGame.PPM );
+        bdefLeftContainer.type = BodyDef.BodyType.StaticBody;
+
+        BodyDef bdefRightContainer = new BodyDef();
+        bdefRightContainer.position.set(490/FHGame.PPM,(163-90)/ FHGame.PPM );
         bdefRightContainer.type = BodyDef.BodyType.StaticBody;
 
 
@@ -82,17 +88,16 @@ public class FieldContainer extends Sprite{
 
 
         // 4. Create the body fixture automatically by using the loader.
-       Vector2 bottleModelOrigin= loader.getOrigin("fieldleft", 1.15f);
+      // Vector2 bottleModelOrigin= loader.getOrigin("fieldleft", 1.15f);
 
 
-        loader.attachFixture(bodyLeftContainer, "fieldleft", fdLeftContainer, 1.14f, 1, 1);
-        loader.attachFixture(bodyRightContainer, "fieldright", fdRightContainer, 1.14f, 1, 1);
+        loader.attachFixture(bodyLeftContainer, "Name", fdLeftContainer, 1f, 1, 1);
+        loader.attachFixture(bodyRightContainer, "right.png", fdRightContainer, 1.22f, 1, 1);
 
-        Vector2 pos = bodyLeftContainer.getPosition().sub(bottleModelOrigin);
+       // Vector2 pos = bodyLeftContainer.getPosition().sub(bottleModelOrigin);
 
 
         //setPosition(40/FHGame.PPM, 40/FHGame.PPM);
-        setPosition(bodyLeftContainer.getPosition().x-(32.5f/2)/FHGame.PPM, bodyLeftContainer.getPosition().y-(30f/2)/FHGame.PPM);
 //        setPosition(bodyRightContainer.getPosition().x-(32.5f/2)/FHGame.PPM, bodyRightContainer.getPosition().y-(30f/2)/FHGame.PPM);
        //setOrigin(bottleModelOrigin.x, bottleModelOrigin.y);
     }
