@@ -17,32 +17,33 @@ import com.crustsoft.flipperhockey.screens.PlayScreen;
  * Created by Morten on 01.03.2016.
  */
 public class FlipperRight extends Flipper{
-        public FlipperRight(PlayScreen playScreen, float xPos, float yPos, float upperAngle, float lowerAngle, float motorSpeed, boolean left) {
-                super(playScreen, xPos, yPos, upperAngle, lowerAngle, motorSpeed, left);
+        public FlipperRight(PlayScreen playScreen, float xPos, float yPos, float motorSpeed, boolean left) {
+                super(playScreen, xPos, yPos,  motorSpeed, left);
                 vertices = new Vector2[4];
-                vertices[0] = new Vector2(0 / FHGame.PPM, 15 / FHGame.PPM);
-                vertices[1] = new Vector2(0 / FHGame.PPM, -15 / FHGame.PPM);
-                vertices[2] = new Vector2(flipperLength / FHGame.PPM, -10 / FHGame.PPM);
-                vertices[3] = new Vector2(flipperLength / FHGame.PPM, 10 / FHGame.PPM);
+                vertices[0] = new Vector2(0 / FHGame.PPM, circleStart_radius / FHGame.PPM);
+                vertices[1] = new Vector2(0 / FHGame.PPM, -circleStart_radius / FHGame.PPM);
+                vertices[2] = new Vector2(flipperLength / FHGame.PPM, -circleEnd_radius / FHGame.PPM);
+                vertices[3] = new Vector2(flipperLength / FHGame.PPM, circleEnd_radius / FHGame.PPM);
                 defineFlipper();
         }
 
+        @Override
+        public void update() {
+                Vector2 position = bodyFlipper.getPosition();
+                // Center body is center sprite here
+                float hw = getWidth() / 2.0f;
+
+                float hh = getHeight() / 2.0f;
+                float a = bodyFlipper.getAngle() * MathUtils.radiansToDegrees;
+                float x = position.x ;
+                float y = position.y - hh;
 
 
+                setBounds(x/FHGame.PPM,y,flipperRegion.getRegionWidth()/FHGame.PPM,flipperRegion.getRegionHeight()/FHGame.PPM);
 
-/*    revoluteJointDef.upperAngle = 20 * MathUtils.degreesToRadians;
-        revoluteJointDef.lowerAngle = -20 * MathUtils.degreesToRadians;
-             private float xPos=495+22;
-        private float yPos=148;
-
-        vertices = new Vector2[4];
-        vertices[0] = new Vector2(0 / FHGame.PPM, 15 / FHGame.PPM);
-        vertices[1] = new Vector2(0 / FHGame.PPM, -15 / FHGame.PPM);
-        vertices[2] = new Vector2(-95 / FHGame.PPM, -10 / FHGame.PPM);
-        vertices[3] = new Vector2(-95 / FHGame.PPM, 10 / FHGame.PPM);
-        */
-
-
-
+                setOrigin((circleStart_radius+20)/FHGame.PPM,(circleStart_radius+20)/FHGame.PPM);
+                setPosition(x+(-circleStart_radius-20)/FHGame.PPM,y);
+                setRotation(a-180);
+        }
 
 }

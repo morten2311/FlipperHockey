@@ -1,5 +1,6 @@
 package com.crustsoft.flipperhockey.helpers;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.crustsoft.flipperhockey.game.FHGame;
 import com.crustsoft.flipperhockey.gameobjects.ScoreLineSensor;
+import com.crustsoft.flipperhockey.screens.PlayScreen;
 
 /**
  * Created by Morten on 02.04.2016.
@@ -37,29 +39,23 @@ public class B2DContactListener implements ContactListener {
 
                 }
                 break;
- /*           case FHGame.BIT_PUCK|FHGame.BIT_CONTAINER:
-                if(fixB.getFilterData().categoryBits == FHGame.BIT_GOAL_TOP){
-                    ((ScoreLineSensor) fixB.getUserData()).getPlayScreen().addScorePlayerBot();
-                }
-                else{
-                    ((ScoreLineSensor) fixA.getUserData()).getPlayScreen().addScorePlayerBot();
+            case FHGame.BIT_PUCK|FHGame.BIT_CONTAINER:
 
-                }
+                break;
+
+
             case FHGame.BIT_PUCK|FHGame.BIT_FLIPPER:
-                if(fixB.getFilterData().categoryBits == FHGame.BIT_GOAL_TOP){
-                    ((ScoreLineSensor) fixB.getUserData()).getPlayScreen().addScorePlayerBot();
-                }
-                else{
-                    ((ScoreLineSensor) fixA.getUserData()).getPlayScreen().addScorePlayerBot();
 
-                }
-                break;*/
+
+
+                break;
         }
 
     }
 
     @Override
     public void endContact(Contact contact) {
+
 
     }
 

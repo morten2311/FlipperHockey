@@ -22,18 +22,22 @@ public class InputHandler implements InputProcessor {
     @Override
     public boolean keyDown(int keycode) {
         if(keycode== Input.Keys.RIGHT){
+
             playScreen.getFlipperRightBottom().joint.setMotorSpeed(-20);
             return true;
         }
         if( keycode== Input.Keys.LEFT) {
+
             playScreen.getFlipperLeftBottom().joint.setMotorSpeed(20);
             return true;
         }
         if( keycode== Input.Keys.D) {
+
             playScreen.getFlipperRightTop().joint.setMotorSpeed(20);
             return true;
         }
         if( keycode== Input.Keys.A) {
+
             playScreen.getFlipperLeftTop().joint.setMotorSpeed(-20);
             return true;
            }

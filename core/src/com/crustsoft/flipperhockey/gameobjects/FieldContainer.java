@@ -58,11 +58,11 @@ public class FieldContainer extends Sprite{
 
 
         BodyDef bdefLeftContainer = new BodyDef();
-        bdefLeftContainer.position.set(40/FHGame.PPM,(163-90)/ FHGame.PPM );
+        bdefLeftContainer.position.set(28.5f/FHGame.PPM,(70)/ FHGame.PPM );
         bdefLeftContainer.type = BodyDef.BodyType.StaticBody;
 
         BodyDef bdefRightContainer = new BodyDef();
-        bdefRightContainer.position.set(490/FHGame.PPM,(163-90)/ FHGame.PPM );
+        bdefRightContainer.position.set(488/FHGame.PPM,(70)/ FHGame.PPM );
         bdefRightContainer.type = BodyDef.BodyType.StaticBody;
 
 
@@ -91,8 +91,8 @@ public class FieldContainer extends Sprite{
       // Vector2 bottleModelOrigin= loader.getOrigin("fieldleft", 1.15f);
 
 
-        loader.attachFixture(bodyLeftContainer, "Name", fdLeftContainer, 1f, 1, 1);
-        loader.attachFixture(bodyRightContainer, "right.png", fdRightContainer, 1.22f, 1, 1);
+        loader.attachFixture(bodyLeftContainer, "left", fdLeftContainer, 1.235f, 1, 1);
+        loader.attachFixture(bodyRightContainer, "right", fdRightContainer, 1.235f, 1, 1);
 
        // Vector2 pos = bodyLeftContainer.getPosition().sub(bottleModelOrigin);
 

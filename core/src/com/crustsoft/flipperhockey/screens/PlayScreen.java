@@ -1,19 +1,20 @@
 package com.crustsoft.flipperhockey.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.crustsoft.flipperhockey.game.FHGame;
@@ -32,13 +33,14 @@ public class PlayScreen implements Screen {
     private int scorePlayerBot = 0;
     private int scorePlayerTop = 0;
 
-
+    public boolean pauseGame = false;
     private InputHandler inputHandler;
     public World world;
     private Box2DDebugRenderer box2DDebugRenderer;
     private FHGame fhGame;
-    private OrthographicCamera camera;
-    private Viewport viewport;
+    private Screen parent;
+    private OrthographicCamera camera, cameraStage;
+    private Viewport viewport, stageViewport;
     private FlipperLeft flipperLeftBottom, flipperLeftTop;
     private FlipperRight flipperRightBottom, flipperRightTop;
     private Puck puck;
@@ -52,42 +54,49 @@ public class PlayScreen implements Screen {
     Texture rect ;
     private ScoreLineSensor scoreLineSensorBottom, scoreLineSensorTop;
 
+    PlayScreenUI playScreenUI;
+    InputMultiplexer inputMultiplexer;
+    public static Sound cling,flipper;
 
-    public PlayScreen(FHGame fhGame) {
-        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
+    public PlayScreen(final FHGame fhGame, Screen parent) {
+
+        this.parent = parent;
         this.fhGame = fhGame;
+
+
+//        cling = Gdx.audio.newSound(Gdx.files.internal("cling.wav"));
+        flipper = Gdx.audio.newSound(Gdx.files.internal("flipp.wav"));
+        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
         world = new World(new Vector2(0, 0), true);
         spriteBatch = fhGame.spriteBatch;
+        playScreenUI = new PlayScreenUI(spriteBatch,this);
+
         box2DDebugRenderer = new Box2DDebugRenderer();
 
+        //Camera, Stage and Viewport
         this.camera = new OrthographicCamera();
 
         viewport = new ExtendViewport(fhGame.LOGICAL_V_WIDTH / FHGame.PPM, fhGame.LOGICAL_V_HEIGHT / FHGame.PPM, camera);
-        //viewport.setScreenBounds(Gdx.graphics.getWidth() / 2, 0, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
-
         viewport.apply();
         camera.position.set((fhGame.LOGICAL_V_WIDTH / FHGame.PPM)/2, (fhGame.LOGICAL_V_HEIGHT / FHGame.PPM)/2,0);
-      //camera.setToOrtho(false, viewport.getWorldWidth(), viewport.getWorldHeight());
+
+
 
         inputHandler = new InputHandler(this);
-        Gdx.input.setInputProcessor(inputHandler);
+        inputMultiplexer = new InputMultiplexer(inputHandler,playScreenUI.stage);
+
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
         //Scorelinesensors, positioned top and bottom, not visible on 4:3 only 16:9.
         scoreLineSensorBottom = new ScoreLineSensor(this,false,FHGame.LOGICAL_V_WIDTH/2,-(fhGame.V_HEIGHT-fhGame.LOGICAL_V_HEIGHT)/4);
         scoreLineSensorTop = new ScoreLineSensor(this,true,FHGame.LOGICAL_V_WIDTH/2,(fhGame.V_HEIGHT-fhGame.LOGICAL_V_HEIGHT)/4+fhGame.LOGICAL_V_HEIGHT);
 
 
-  /*      flipperLeftBottom = new FlipperLeft(this, 195, 145, 20, -20, -2, true);
-        flipperRightBottom = new FlipperRight(this, 495 + 22, 145, 20, -20, 2, false);
+        flipperLeftBottom = new FlipperLeft(this, 150, 145-80, -2, true);
+        flipperRightBottom = new FlipperRight(this, 490, 145-80,  2, false);
 
-        flipperLeftTop = new FlipperLeft(this, 195, 995, 20, -20, 2, true);
-        flipperRightTop = new FlipperRight(this, 495 + 22, 995, 20, -20, -2, false);  */
-
-        flipperLeftBottom = new FlipperLeft(this, 160, 145-90, 20, -20, -2, true);
-        flipperRightBottom = new FlipperRight(this, 480, 145-90, 20, -20, 2, false);
-
-        flipperLeftTop = new FlipperLeft(this, 160, 995-90, 20, -20, 2, true);
-        flipperRightTop = new FlipperRight(this, 480, 995-90, 20, -20, -2, false);
+        flipperLeftTop = new FlipperLeft(this, 150, 995-100,  2, true);
+        flipperRightTop = new FlipperRight(this, 490, 995-100,  -2, false);
 
         puck = new Puck(this,390,571);
         fieldContainer = new FieldContainer(this);
@@ -112,33 +121,44 @@ public class PlayScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height,true);
-        //camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         camera.position.set((fhGame.LOGICAL_V_WIDTH / FHGame.PPM)/2, (fhGame.LOGICAL_V_HEIGHT / FHGame.PPM)/2,0);
-
+        playScreenUI.stage.getViewport().update(width,height);
+      // playScreenUI.stage.getCamera().position.set((fhGame.LOGICAL_V_WIDTH )/2, (fhGame.LOGICAL_V_HEIGHT )/2,0);
     }
 
 
 
     public void update(float delta) {
         if (puck.bodyPuck.getPosition().y > (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, 4f));
+            world.setGravity(new Vector2(0, 4.5f));
 
         }
         if (puck.bodyPuck.getPosition().y < (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, -4f));
+            world.setGravity(new Vector2(0, -4.5f));
 
         }
         world.step(fhGame.STEP, 6, 2);
-       puck.update(delta);
-
-        camera.update();
+        puck.update(delta);
+        flipperLeftBottom.update();
+        flipperRightBottom.update();
+        flipperRightTop.update();
+        flipperLeftTop.update();
+        scoreLineSensorBottom.update();
+        scoreLineSensorTop.update();
 
     }
 
     @Override
     public void render(float delta) {
 
+        if(!pauseGame){
         update(delta);
+
+
+        }
+        camera.update();
+       // playScreenUI.stage.getCamera().update();
+
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -149,65 +169,125 @@ public class PlayScreen implements Screen {
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
 
-        shapeRenderer.setColor(Color.BROWN);
+        // shapeRenderer.setColor(Color.BROWN);
+        shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
         shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.rect(rectangle.getX() / FHGame.PPM, rectangle.getY() / FHGame.PPM, rectangle.getWidth() / FHGame.PPM, rectangle.getHeight() / FHGame.PPM);
+        shapeRenderer.setColor(Color.GREEN);
+
+
         shapeRenderer.end();
 
 
-        //spriteBatch.draw(fieldContainer.texture, 10 /FHGame.PPM, 10/FHGame.PPM,114/FHGame.PPM,814/FHGame.PPM);
-       // fieldContainer.draw(spriteBatch);
-        spriteBatch.enableBlending();
-        spriteBatch.begin();
 
+        spriteBatch.begin();
+        //Markers
         spriteBatch.draw(markers,58/FHGame.PPM,151.5f/FHGame.PPM,markers.getWidth()/FHGame.PPM,markers.getHeight()/fhGame.PPM);
         spriteBatch.end();
-
         spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         spriteBatch.begin();
 
+        //spriteBatch.enableBlending();
+
+        //Glow
         spriteBatch.setColor(Color.BLUE );
         spriteBatch.draw(laser,-36.5f/FHGame.PPM,7.5f/FHGame.PPM,(laser.getWidth())/FHGame.PPM,(laser.getHeight())/FHGame.PPM);
 
+        //Puck
+        puck.setTextureGlow();
+        puck.setColor(Color.BLUE);
+        puck.draw(spriteBatch);
 
+        //Scorelines
+        scoreLineSensorBottom.setTextureGlow();
+        scoreLineSensorBottom.setColor(Color.GREEN);
+        scoreLineSensorBottom.draw(spriteBatch);
 
+        scoreLineSensorTop.setTextureGlow();
+        scoreLineSensorTop.setColor(Color.RED);
+        scoreLineSensorTop.draw(spriteBatch);
 
+        //Flipper
+        flipperLeftBottom.setTextureGlow();
+        flipperLeftBottom.setColor(Color.GREEN);
+        flipperLeftBottom.draw(spriteBatch);
 
+        flipperRightBottom.setTextureGlow();
+        flipperRightBottom.setColor(Color.GREEN);
+        flipperRightBottom.draw(spriteBatch);
 
+        flipperLeftTop.setTextureGlow();
+        flipperLeftTop.setColor(Color.RED);
+        flipperLeftTop.draw(spriteBatch);
+
+        flipperRightTop.setTextureGlow();
+        flipperRightTop.setColor(Color.RED);
+        flipperRightTop.draw(spriteBatch);
+        //Overlay
         spriteBatch.setColor(Color.WHITE);
         spriteBatch.draw(rect,-36.5f/FHGame.PPM,7.5f/FHGame.PPM,(rect.getWidth())/FHGame.PPM,(rect.getHeight())/FHGame.PPM);
 
 
-        spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        //Flipper
+        flipperLeftBottom.setTextureFlipper();
+        flipperLeftBottom.setColor(Color.WHITE);
+        flipperLeftBottom.draw(spriteBatch);
 
-        spriteBatch.end();
-        spriteBatch.begin();
+        flipperRightBottom.setTextureFlipper();
+        flipperRightBottom.setColor(Color.WHITE);
+        flipperRightBottom.draw(spriteBatch);
+
+        flipperLeftTop.setTextureFlipper();
+        flipperLeftTop.setColor(Color.WHITE);
+        flipperLeftTop.draw(spriteBatch);
+
+        flipperRightTop.setTextureFlipper();
+        flipperRightTop.setColor(Color.WHITE);
+        flipperRightTop.draw(spriteBatch);
+
+
+        //Puck
+        puck.setTexturePuck();
+        puck.setColor(Color.WHITE);
         puck.draw(spriteBatch);
+
+        //Scorelines
+        scoreLineSensorBottom.setTextureScoreLine();
+        scoreLineSensorBottom.setColor(Color.WHITE);
+        scoreLineSensorBottom.draw(spriteBatch);
+
+        scoreLineSensorTop.setTextureScoreLine();
+        scoreLineSensorTop.setColor(Color.WHITE);
+        scoreLineSensorTop.draw(spriteBatch);
+
+        //spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         spriteBatch.end();
 
-        box2DDebugRenderer.render(world, camera.combined);
+       // box2DDebugRenderer.render(world, camera.combined);
 
 
-        //fhGame.spriteBatch.setProjectionMatrix(camera.combined);
+       // fhGame.spriteBatch.setProjectionMatrix(camera.combined);
 
 
+        spriteBatch.setProjectionMatrix( playScreenUI.stage.getCamera().combined);
+        playScreenUI.stage.act();
+        playScreenUI.stage.draw();
 
+    }
 
+    public void pauseGame(){
+       pauseGame=true;
+    }
+    public void resumeGame(){
 
-
-
-
-
-
-
-
-
+        pauseGame= false;
 
     }
 
     @Override
     public void show() {
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
     }
 
@@ -223,6 +303,7 @@ public class PlayScreen implements Screen {
 
     @Override
     public void hide() {
+        Gdx.input.setInputProcessor(null);
 
     }
 
@@ -245,6 +326,13 @@ public class PlayScreen implements Screen {
 
     }
 
+    public PlayScreen(Viewport viewport) {
+        this.viewport = viewport;
+    }
+
+    public Viewport getViewport() {
+        return viewport;
+    }
 
     public FlipperLeft getFlipperLeftBottom() {
         return flipperLeftBottom;
@@ -276,5 +364,13 @@ public class PlayScreen implements Screen {
 
     public int getScorePlayerBot() {
         return scorePlayerBot;
+    }
+
+    public Screen getParent() {
+        return parent;
+    }
+
+    public FHGame getFhGame() {
+        return fhGame;
     }
 }

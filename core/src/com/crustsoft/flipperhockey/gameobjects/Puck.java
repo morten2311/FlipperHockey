@@ -22,8 +22,8 @@ public class Puck   extends Sprite{
 
   public  BodyDef bdefPuck;
     public Body bodyPuck;
-    Texture puck;
-    TextureRegion puckreg;
+    Texture puck, puckGlow;
+    TextureRegion puckreg, puckGlowreg;
     float x,y;
 
     public Puck(PlayScreen playScreen,float x, float y) {
@@ -32,10 +32,12 @@ public class Puck   extends Sprite{
         this.playScreen = playScreen;
         this.world=playScreen.world;
         puck = new Texture("puck.png");
+        puckGlow = new Texture("puckGlow.png");
+        puckGlow.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        puck.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        puckGlowreg = new TextureRegion(puckGlow,0,0,puckGlow.getWidth(),puckGlow.getHeight());
         puckreg = new TextureRegion(puck,0,0,puck.getWidth(),puck.getHeight());
-        setRegion(puckreg);
 
-        setBounds(0/FHGame.PPM,0,puckreg.getRegionWidth()/FHGame.PPM,puckreg.getRegionHeight()/FHGame.PPM);
         definePuck();
     }
 
@@ -48,13 +50,13 @@ public class Puck   extends Sprite{
         bdefPuck.position.set(x / FHGame.PPM, y / FHGame.PPM);
 
         CircleShape CirclePuck = new CircleShape();
-        CirclePuck.setRadius((38f) / FHGame.PPM);
+        CirclePuck.setRadius((41f) / FHGame.PPM);
 
         FixtureDef fdefPuck = new FixtureDef();
 
         fdefPuck.shape=CirclePuck;
-        fdefPuck.density=0.7f;
-        fdefPuck.restitution=0.4f;
+        fdefPuck.density=0.5f;
+        fdefPuck.restitution=0.0f;
         fdefPuck.friction=0.0f;
         fdefPuck.filter.categoryBits= FHGame.BIT_PUCK;
         fdefPuck.filter.maskBits=FHGame.BIT_CONTAINER|FHGame.BIT_FLIPPER|FHGame.BIT_GOAL_BOT |FHGame.BIT_GOAL_TOP;
@@ -62,7 +64,7 @@ public class Puck   extends Sprite{
 
         bodyPuck =world.createBody(bdefPuck);
        // bodyPuck.setFixedRotation(true);
-        bodyPuck.setLinearDamping(0.2f);
+        bodyPuck.setLinearDamping(0.1f);
         bodyPuck.setUserData(this);
         bodyPuck.createFixture(fdefPuck);
 
@@ -70,6 +72,17 @@ public class Puck   extends Sprite{
     public void resetPuck(){
         world.destroyBody(bodyPuck);
         definePuck();
+    }
+    public void setTexturePuck(){
+        setRegion(puckreg);
+
+
+
+    }
+    public void setTextureGlow(){
+        setRegion(puckGlow);
+
+
     }
 
     public void update(float dt){
@@ -82,10 +95,14 @@ public class Puck   extends Sprite{
         float x = position.x - hw;
         float y = position.y - hh;
 
+        setBounds(x/FHGame.PPM,y,puckreg.getRegionWidth()/FHGame.PPM,puckreg.getRegionHeight()/FHGame.PPM);
+
         setPosition(x, y);
         setRotation(a);
 
+
     }
+
 
 
 

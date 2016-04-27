@@ -15,41 +15,39 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.crustsoft.flipperhockey.game.FHGame;
 
 /**
- * Created by Morten on 28.02.2016.
+ * Created by Morten on 18.04.2016.
  */
-public class MenuScreen implements Screen {
+public class PauseScreen implements Screen {
     Skin skin;
     Stage stage;
     private Table table;
-    private final TextButton twoPlayerButton, onePlayerButton, settingsButton, exitButton, multiplayerButton;
+    private final TextButton exitButton, resumeButton;
     TextureAtlas atlas;
     Array<TextButton> textButtons;
+    private Screen parent;
+    private FHGame fhGame;
 
     private BitmapFont fontUp, fontDown;
-    FHGame fhGame;
 
-    public MenuScreen(final FHGame fhGame) {
-        this.fhGame=fhGame;
+    public PauseScreen(final FHGame fhGame, final Screen parent) {
+        this.parent = parent;
+        this.fhGame = fhGame;
         this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH,FHGame.LOGICAL_V_HEIGHT));
 
         atlas = new TextureAtlas("buttons.pack");
         textButtons = new Array<TextButton>();
         this.skin = new Skin();
         skin.addRegions(atlas);
-        //skin.add("default-fontUp",new BitmapFont(Gdx.files.internal("fonts/fontUp-export.fnt")),BitmapFont.class);
         final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(); //** Button properties **//
         style.up = skin.getDrawable("buttonUp");
         style.down = skin.getDrawable("buttonDown");
-
         fontDown= new BitmapFont(Gdx.files.internal("fonts/fontDown-export2x.fnt"),false);
         fontUp = new BitmapFont(Gdx.files.internal("fonts/fontUp-export2x.fnt"),false);
         fontUp.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         style.font = fontUp;
-
 
 
 //        this.skin= new Skin((Gdx.files.internal("uiskin.json")));
@@ -60,45 +58,37 @@ public class MenuScreen implements Screen {
         table.setWidth(stage.getWidth());
         table.align(Align.center| Align.top);
         table.setPosition(0,FHGame.LOGICAL_V_HEIGHT);
-        twoPlayerButton = new TextButton("TWO PLAYER", style);
-        onePlayerButton = new TextButton("ONE PLAYER", style);
-        settingsButton  = new TextButton("SETTINGS", style);
-        exitButton = new TextButton("EXIT", style);
-        multiplayerButton = new TextButton("MULTIPLAYER", style);
 
-        textButtons.add(multiplayerButton);
-        textButtons.add(onePlayerButton);
-        textButtons.add(twoPlayerButton);
-        textButtons.add(settingsButton);
+        exitButton = new TextButton("RESUME", style);
+        resumeButton = new TextButton("EXIT", style);
+
+
+        textButtons.add(resumeButton);
         textButtons.add(exitButton);
 
         table.padTop(FHGame.LOGICAL_V_HEIGHT/8);
         for (final TextButton textButton: textButtons){
             textButton.addListener(new ClickListener(){
-
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                     style.font=fontDown;
                     textButton.setStyle(style);
-                    //System.out.println(textButton.getText());
-
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    System.out.println("touch");
                     style.font=fontUp;
                     textButton.setStyle(style);
+                    if(isOver()){
+                    if(textButton.getText().toString().equals("RESUME")){
 
-                    if(textButton.getText().toString().equals("TWO PLAYER")){
-                        System.out.println("2Player");
-                        fhGame.setScreen(new PlayScreen(fhGame,MenuScreen.this));
-                    }
-                    else if(textButton.getText().toString().equals("EXIT")){
-                        Gdx.app.exit();
+
+                        fhGame.setScreen(parent);
+                        dispose();
                     }
 
+                    }
 
                 }
             });
@@ -111,13 +101,11 @@ public class MenuScreen implements Screen {
 
 
         stage.addActor(table);
-        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-
 
     }
 
@@ -151,6 +139,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void hide() {
+        Gdx.input.setInputProcessor(null);
 
     }
 

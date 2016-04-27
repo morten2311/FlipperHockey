@@ -1,5 +1,8 @@
 package com.crustsoft.flipperhockey.gameobjects;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -18,7 +21,7 @@ import com.crustsoft.flipperhockey.screens.PlayScreen;
 /**
  * Created by Morten on 01.03.2016.
  */
-public class Flipper {
+public abstract class Flipper extends Sprite{
     Vector2[] vertices;
     // BodyDef bdefStartC, bdefEndC, bdefPoly, bdefFlipper;
     Body bodyFlipper, bodyStartC;
@@ -26,34 +29,44 @@ public class Flipper {
     public PlayScreen playScreen;
     public RevoluteJoint joint;
 
-    private float xPos;
-    private float yPos;
+    protected float xPos;
+    protected float yPos;
     protected float flipperLength;
     public float upperAngle;
     private float lowerAngle;
+    CircleShape circleStart;
 
-    private float circleStart_radius=15;
-    private float circleEnd_radius=10;
+    protected float circleStart_radius=18f;
+    protected float circleEnd_radius=12f;
     private float density;
     float motorSpeed;
     float maxMotorTorque;
 
+    Texture flipper, flipperGlow;
+    TextureRegion flipperRegion, flipperGlowRegion;
 
-    public Flipper(PlayScreen playScreen, float xPos, float yPos, float upperAngle, float lowerAngle,float motorSpeed,boolean left) {
+
+    public Flipper(PlayScreen playScreen, float xPos, float yPos,float motorSpeed,boolean left) {
+        flipper = new Texture("flipper.png");
+        flipperGlow= new Texture("flipperGlow.png");
+        flipperGlow.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        flipperGlowRegion = new TextureRegion(flipperGlow,0,0,flipper.getWidth(),flipper.getHeight());
+        flipperRegion = new TextureRegion(flipper,0,0,flipper.getWidth(),flipper.getHeight());
+        flipper.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         this.xPos = xPos;
         this.yPos = yPos;
-        this.upperAngle = upperAngle;
-        this.lowerAngle = lowerAngle;
+        this.upperAngle = 17;
+        this.lowerAngle = -17;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.density=5f;
-        this.maxMotorTorque=140;
+        this.density=15f;
+        this.maxMotorTorque=500;
         this.motorSpeed=motorSpeed;
         if(left){
-            flipperLength=114;
+            flipperLength=118;
         }
         else {
-            flipperLength=-114;
+            flipperLength=-118;
         }
 
     }
@@ -70,13 +83,16 @@ public class Flipper {
         bodyFlipper.setBullet(true);
 
         //CircleStart
-        CircleShape circleStart = new CircleShape();
+         circleStart = new CircleShape();
+
         circleStart.setRadius(circleStart_radius / FHGame.PPM);
         BodyDef bdefStartC = new BodyDef();
         bdefStartC.position.set(xPos / FHGame.PPM, yPos / FHGame.PPM);
         bdefStartC.type = BodyDef.BodyType.StaticBody;
         FixtureDef fDefStartC = new FixtureDef();
         fDefStartC.shape = circleStart;
+        fDefStartC.restitution=0.2f;
+
         bodyStartC = world.createBody(bdefStartC);
         bodyStartC.createFixture(fDefStartC);
         circleStart.dispose();
@@ -86,6 +102,7 @@ public class Flipper {
         circleEnd.setRadius(circleEnd_radius / FHGame.PPM);
         circleEnd.setPosition(new Vector2(flipperLength / FHGame.PPM, 0));
         FixtureDef fDefEndC = new FixtureDef();
+        fDefEndC.restitution=0.2f;
         fDefEndC.shape = circleEnd;
 
         //Polygon
@@ -95,6 +112,9 @@ public class Flipper {
         fDefPoly.shape = polygonShape;
         bodyFlipper.createFixture(fDefPoly);
         fDefPoly.density = density;
+        fDefPoly.restitution=0.2f;
+
+
         //Create fixtures
         bodyFlipper.createFixture(fDefEndC);
         bodyFlipper.createFixture(fDefPoly);
@@ -126,5 +146,19 @@ public class Flipper {
         joint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
 
+
     }
+    public void setTextureFlipper(){
+        setRegion(flipperRegion);
+
+
+
+    }
+    public void setTextureGlow(){
+        setRegion(flipperGlowRegion);
+
+
+    }
+    public abstract void update();
+
 }
