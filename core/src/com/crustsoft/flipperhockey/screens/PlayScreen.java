@@ -34,6 +34,9 @@ public class PlayScreen implements Screen {
     private int scorePlayerTop = 0;
 
     public boolean pauseGame = false;
+    public boolean scoreBottom = false;
+    public boolean scoreTop = false;
+
     private InputHandler inputHandler;
     public World world;
     private Box2DDebugRenderer box2DDebugRenderer;
@@ -57,7 +60,7 @@ public class PlayScreen implements Screen {
     PlayScreenUI playScreenUI;
     InputMultiplexer inputMultiplexer;
     public static Sound cling,flipper;
-
+    private float speed=2.5f;
     public PlayScreen(final FHGame fhGame, Screen parent) {
 
         this.parent = parent;
@@ -92,11 +95,11 @@ public class PlayScreen implements Screen {
         scoreLineSensorTop = new ScoreLineSensor(this,true,FHGame.LOGICAL_V_WIDTH/2,(fhGame.V_HEIGHT-fhGame.LOGICAL_V_HEIGHT)/4+fhGame.LOGICAL_V_HEIGHT);
 
 
-        flipperLeftBottom = new FlipperLeft(this, 150, 145-80, -2, true);
-        flipperRightBottom = new FlipperRight(this, 490, 145-80,  2, false);
+        flipperLeftBottom = new FlipperLeft(this, 148, 145-82, -speed, true);
+        flipperRightBottom = new FlipperRight(this, 492, 145-82,  speed, false);
 
-        flipperLeftTop = new FlipperLeft(this, 150, 995-100,  2, true);
-        flipperRightTop = new FlipperRight(this, 490, 995-100,  -2, false);
+        flipperLeftTop = new FlipperLeft(this, 148, 995-98,  speed, true);
+        flipperRightTop = new FlipperRight(this, 492, 995-98,  -speed, false);
 
         puck = new Puck(this,390,571);
         fieldContainer = new FieldContainer(this);
@@ -130,11 +133,11 @@ public class PlayScreen implements Screen {
 
     public void update(float delta) {
         if (puck.bodyPuck.getPosition().y > (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, 4.5f));
+            world.setGravity(new Vector2(0, 2.5f));
 
         }
         if (puck.bodyPuck.getPosition().y < (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, -4.5f));
+            world.setGravity(new Vector2(0, -2.5f));
 
         }
         world.step(fhGame.STEP, 6, 2);
@@ -145,6 +148,7 @@ public class PlayScreen implements Screen {
         flipperLeftTop.update();
         scoreLineSensorBottom.update();
         scoreLineSensorTop.update();
+        playScreenUI.update(delta);
 
     }
 
@@ -264,14 +268,19 @@ public class PlayScreen implements Screen {
         //spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         spriteBatch.end();
 
-       // box2DDebugRenderer.render(world, camera.combined);
+        box2DDebugRenderer.render(world, camera.combined);
 
 
        // fhGame.spriteBatch.setProjectionMatrix(camera.combined);
 
 
         spriteBatch.setProjectionMatrix( playScreenUI.stage.getCamera().combined);
-        playScreenUI.stage.act();
+
+
+
+
+        playScreenUI.stage.act(delta);
+
         playScreenUI.stage.draw();
 
     }
@@ -316,6 +325,8 @@ public class PlayScreen implements Screen {
     public void addScorePlayerBot() {
         scorePlayerBot++;
         System.out.println(scorePlayerBot);
+        scoreBottom=true;
+        playScreenUI.showGoalBottomPlayer();
 
     }
 

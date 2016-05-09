@@ -68,11 +68,13 @@ public class FieldContainer extends Sprite{
 
         // 2. Create a FixtureDef, as usual.
         FixtureDef fdLeftContainer = new FixtureDef();
+        fdLeftContainer.restitution=0.1f;
+
 
 
 
         FixtureDef fdRightContainer = new FixtureDef();
-
+        fdRightContainer.restitution=0.1f;
 
         fdLeftContainer.filter.categoryBits=FHGame.BIT_CONTAINER;
         fdRightContainer.filter.categoryBits=FHGame.BIT_CONTAINER;

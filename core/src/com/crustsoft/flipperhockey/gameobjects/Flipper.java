@@ -59,7 +59,7 @@ public abstract class Flipper extends Sprite{
         this.lowerAngle = -17;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.density=15f;
+        this.density=10f;
         this.maxMotorTorque=500;
         this.motorSpeed=motorSpeed;
         if(left){
@@ -78,6 +78,7 @@ public abstract class Flipper extends Sprite{
         BodyDef bdefFlipper = new BodyDef();
         bdefFlipper.type = BodyDef.BodyType.DynamicBody;
         bdefFlipper.position.set(xPos / FHGame.PPM, yPos / FHGame.PPM);
+
 
         bodyFlipper = world.createBody(bdefFlipper);
         bodyFlipper.setBullet(true);
@@ -154,6 +155,7 @@ public abstract class Flipper extends Sprite{
 
 
     }
+
     public void setTextureGlow(){
         setRegion(flipperGlowRegion);
 

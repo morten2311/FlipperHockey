@@ -1,9 +1,7 @@
 package com.crustsoft.flipperhockey.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,10 +9,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -22,12 +26,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.crustsoft.flipperhockey.game.FHGame;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 /**
  * Created by Morten on 18.04.2016.
@@ -35,7 +39,6 @@ import com.crustsoft.flipperhockey.game.FHGame;
 public class PlayScreenUI implements Disposable {
     private Skin skin;
     public Stage stage;
-    private Table table;
     private  TextButton exitButton, resumeButton;
     TextureAtlas atlas;
     Array<TextButton> textButtons;
@@ -43,8 +46,13 @@ public class PlayScreenUI implements Disposable {
     Button pauseButton;
     Texture pause;
     Button.ButtonStyle buttonStyle;
-
+    Label scoreTopLabel,scoreBottomLabel, goalLabel, winnerLabel;
+    Label.LabelStyle labelStyle;
     private BitmapFont fontUp, fontDown;
+    public Container containerGoal;
+    Actions actions;
+    Action action;
+
     PlayScreen playScreen;
     public PlayScreenUI(SpriteBatch batch, final PlayScreen playScreen) {
         this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH,FHGame.LOGICAL_V_HEIGHT,new OrthographicCamera()));
@@ -57,11 +65,43 @@ public class PlayScreenUI implements Disposable {
         buttonStyle.up= skin.getDrawable("pause");
         buttonStyle.down= skin.getDrawable("pause");
         pauseButton = new Button(skin.getDrawable("pause"));
-        //stage.getCamera().position.set((FHGame.LOGICAL_V_WIDTH )/2, (FHGame.LOGICAL_V_HEIGHT )/2,0);
+
+        fontUp = new BitmapFont(Gdx.files.internal("fonts/fontUp-export2x.fnt"),false);
+
+        labelStyle = new Label.LabelStyle();
+        labelStyle.font=fontUp;
+
+        goalLabel = new Label("GOAL!",labelStyle);
+        scoreTopLabel = new Label(playScreen.getScorePlayerTop()+"",labelStyle);
+        scoreBottomLabel = new Label(playScreen.getScorePlayerBot()+"", labelStyle);
+        Container containerBottom = new Container(scoreBottomLabel);
+        Container containerTop = new Container(scoreTopLabel);
+        containerGoal = new Container(goalLabel);
+        containerGoal.setTransform(true);
+       // containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(1),Actions.rotateBy(360,1f)),Actions.parallel(Actions.rotateBy(-360,1f),Actions.fadeOut(1))));
+        containerGoal.setVisible(false);
+        //containerGoal.addAction(Actions.rotateBy(-360,2f));
+
+
+
+
+        containerBottom.setTransform(true);
+        containerBottom.setPosition(FHGame.LOGICAL_V_WIDTH-100,FHGame.LOGICAL_V_HEIGHT/2-100);
+        containerBottom.rotateBy(-90);
+
+        containerTop.setTransform(true);
+        containerTop.setPosition(FHGame.LOGICAL_V_WIDTH-100,FHGame.LOGICAL_V_HEIGHT/2+100);
+        containerTop.rotateBy(-90);
+
+        //stage.addActor(containerGoal);
+        stage.addActor(containerBottom);
+        stage.addActor(containerTop);
+        stage.addActor(containerGoal);
+
         pauseButton.setPosition((FHGame.LOGICAL_V_WIDTH)-pauseButton.getWidth()*1.5f,(FHGame.LOGICAL_V_HEIGHT/2)-pauseButton.getHeight()/2);
 
         stage.addActor(pauseButton);
-
+        //stage.addActor(scoreTopLabel);
         pauseButton.addListener(new ClickListener() {
 
             @Override
@@ -141,6 +181,11 @@ public class PlayScreenUI implements Disposable {
 
     }
 
+    public void update(float delta){
+        scoreTopLabel.setText(playScreen.getScorePlayerTop()+"");
+        scoreBottomLabel.setText(playScreen.getScorePlayerBot()+"");
+
+    }
     public void show(){
 
         dialog.show(stage);
@@ -149,7 +194,28 @@ public class PlayScreenUI implements Disposable {
         //dialog.align(Align.top|Align.center);
 
     }
+    public void showGoalTopPlayer(){
+        containerGoal.setPosition(320,720);
 
+        containerGoal.setVisible(true);
+        containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.8f),Actions.rotateBy(360,0.8f))
+                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f))));
+
+    }
+    public void showGoalBottomPlayer(){
+        containerGoal.setPosition(320,360);
+
+        containerGoal.setVisible(true);
+        containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.8f),Actions.rotateBy(360,0.8f))
+                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f))));
+
+    }
+    public void showWinTopPlayer(){
+
+    }
+    public void showWinBottomPlayer(){
+
+    }
     public void pauseGame(){
         playScreen.pauseGame();
     }

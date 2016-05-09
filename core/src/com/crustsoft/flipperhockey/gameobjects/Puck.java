@@ -55,8 +55,8 @@ public class Puck   extends Sprite{
         FixtureDef fdefPuck = new FixtureDef();
 
         fdefPuck.shape=CirclePuck;
-        fdefPuck.density=0.5f;
-        fdefPuck.restitution=0.0f;
+        fdefPuck.density=1f;
+        fdefPuck.restitution=0.3f;
         fdefPuck.friction=0.0f;
         fdefPuck.filter.categoryBits= FHGame.BIT_PUCK;
         fdefPuck.filter.maskBits=FHGame.BIT_CONTAINER|FHGame.BIT_FLIPPER|FHGame.BIT_GOAL_BOT |FHGame.BIT_GOAL_TOP;
@@ -64,7 +64,7 @@ public class Puck   extends Sprite{
 
         bodyPuck =world.createBody(bdefPuck);
        // bodyPuck.setFixedRotation(true);
-        bodyPuck.setLinearDamping(0.1f);
+       // bodyPuck.setLinearDamping(0.1f);
         bodyPuck.setUserData(this);
         bodyPuck.createFixture(fdefPuck);
 
