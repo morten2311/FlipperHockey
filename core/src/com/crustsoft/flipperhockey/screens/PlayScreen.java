@@ -10,11 +10,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.crustsoft.flipperhockey.game.FHGame;
@@ -26,13 +30,15 @@ import com.crustsoft.flipperhockey.gameobjects.ScoreLineSensor;
 import com.crustsoft.flipperhockey.helpers.B2DContactListener;
 import com.crustsoft.flipperhockey.helpers.InputHandler;
 
+import java.util.Random;
+
 /**
  * Created by Morten on 28.02.2016.
  */
 public class PlayScreen implements Screen {
     private int scorePlayerBot = 0;
     private int scorePlayerTop = 0;
-
+    boolean isGoal = false;
     public boolean pauseGame = false;
     public boolean scoreBottom = false;
     public boolean scoreTop = false;
@@ -55,36 +61,37 @@ public class PlayScreen implements Screen {
     Texture laser2;
     Texture markers;
     Texture rect ;
+    public boolean toggle = true;
     private ScoreLineSensor scoreLineSensorBottom, scoreLineSensorTop;
-
+    Random random;
+    public float rand;
     PlayScreenUI playScreenUI;
     InputMultiplexer inputMultiplexer;
     public static Sound cling,flipper;
     private float speed=2.5f;
+    public int counter=0;
     public PlayScreen(final FHGame fhGame, Screen parent) {
-
         this.parent = parent;
         this.fhGame = fhGame;
-
-
-//        cling = Gdx.audio.newSound(Gdx.files.internal("cling.wav"));
-        flipper = Gdx.audio.newSound(Gdx.files.internal("flipp.wav"));
-        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
         world = new World(new Vector2(0, 0), true);
         spriteBatch = fhGame.spriteBatch;
         playScreenUI = new PlayScreenUI(spriteBatch,this);
-
         box2DDebugRenderer = new Box2DDebugRenderer();
 
         //Camera, Stage and Viewport
         this.camera = new OrthographicCamera();
-
         viewport = new ExtendViewport(fhGame.LOGICAL_V_WIDTH / FHGame.PPM, fhGame.LOGICAL_V_HEIGHT / FHGame.PPM, camera);
         viewport.apply();
         camera.position.set((fhGame.LOGICAL_V_WIDTH / FHGame.PPM)/2, (fhGame.LOGICAL_V_HEIGHT / FHGame.PPM)/2,0);
 
+        getRandomAngle();
 
 
+//        cling = Gdx.audio.newSound(Gdx.files.internal("cling.wav"));
+        System.out.println(Gdx.graphics.getWidth() + " " + Gdx.graphics.getHeight());
+
+        flipper = Gdx.audio.newSound(Gdx.files.internal("flipp.wav"));
+        //Setup input for menu and game
         inputHandler = new InputHandler(this);
         inputMultiplexer = new InputMultiplexer(inputHandler,playScreenUI.stage);
 
@@ -95,13 +102,21 @@ public class PlayScreen implements Screen {
         scoreLineSensorTop = new ScoreLineSensor(this,true,FHGame.LOGICAL_V_WIDTH/2,(fhGame.V_HEIGHT-fhGame.LOGICAL_V_HEIGHT)/4+fhGame.LOGICAL_V_HEIGHT);
 
 
-        flipperLeftBottom = new FlipperLeft(this, 148, 145-82, -speed, true);
+    /*    flipperLeftBottom = new FlipperLeft(this, 148, 145-82, -speed, true);
         flipperRightBottom = new FlipperRight(this, 492, 145-82,  speed, false);
 
         flipperLeftTop = new FlipperLeft(this, 148, 995-98,  speed, true);
-        flipperRightTop = new FlipperRight(this, 492, 995-98,  -speed, false);
+        flipperRightTop = new FlipperRight(this, 492, 995-98,  -speed, false);  */
 
-        puck = new Puck(this,390,571);
+
+        //Setup flippers
+        flipperLeftBottom = new FlipperLeft(this, 147, 145-82, -speed, true);
+        flipperRightBottom = new FlipperRight(this, 493, 145-82,  speed, false);
+
+        flipperLeftTop = new FlipperLeft(this, 147, 995-98,  speed, true);
+        flipperRightTop = new FlipperRight(this, 493, 995-98,  -speed, false);
+
+        puck = new Puck(this,FHGame.LOGICAL_V_WIDTH/2,fhGame.LOGICAL_V_HEIGHT/2);
         fieldContainer = new FieldContainer(this);
 
         rectangle = new Rectangle(0, 0, 640, 960);
@@ -121,26 +136,48 @@ public class PlayScreen implements Screen {
         rect.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height,true);
-        camera.position.set((fhGame.LOGICAL_V_WIDTH / FHGame.PPM)/2, (fhGame.LOGICAL_V_HEIGHT / FHGame.PPM)/2,0);
-        playScreenUI.stage.getViewport().update(width,height);
-      // playScreenUI.stage.getCamera().position.set((fhGame.LOGICAL_V_WIDTH )/2, (fhGame.LOGICAL_V_HEIGHT )/2,0);
-    }
-
 
 
     public void update(float delta) {
-        if (puck.bodyPuck.getPosition().y > (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, 2.5f));
 
-        }
-        if (puck.bodyPuck.getPosition().y < (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, -2.5f));
+            if (puck.bodyPuck.getPosition().y > (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
+                world.setGravity(new Vector2(0, 2.5f));
 
-        }
+            }
+            if (puck.bodyPuck.getPosition().y < (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
+                world.setGravity(new Vector2(0, -2.5f));
+
+            }
+            System.out.println(counter);
+            if(counter <50)
+            {
+                if(toggle&&counter%3==0)
+                {
+                   puck.getPuckBody().setLinearVelocity(2.0f,0.0f);
+
+                }
+                else if(counter%3==0)
+                {
+                    puck.getPuckBody().setLinearVelocity(-2.0f,0.0f);
+
+                }
+                toggle = !toggle;
+            }
+
+            counter++;
+
+            if(counter>50&&toggle)
+            {
+               // puck.setDynamic();
+
+                puck.getPuckBody().setType(BodyDef.BodyType.DynamicBody);
+                puck.getPuckBody().setLinearVelocity(new Vector2(MathUtils.cos(rand)*5,MathUtils.sin(rand)*5));
+                toggle=false;
+            }
+
+
         world.step(fhGame.STEP, 6, 2);
+
         puck.update(delta);
         flipperLeftBottom.update();
         flipperRightBottom.update();
@@ -150,7 +187,16 @@ public class PlayScreen implements Screen {
         scoreLineSensorTop.update();
         playScreenUI.update(delta);
 
+
     }
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height,true);
+        camera.position.set((fhGame.LOGICAL_V_WIDTH / FHGame.PPM)/2, (fhGame.LOGICAL_V_HEIGHT / FHGame.PPM)/2,0);
+        playScreenUI.stage.getViewport().update(width,height);
+        // playScreenUI.stage.getCamera().position.set((fhGame.LOGICAL_V_WIDTH )/2, (fhGame.LOGICAL_V_HEIGHT )/2,0);
+    }
+
 
     @Override
     public void render(float delta) {
@@ -268,22 +314,16 @@ public class PlayScreen implements Screen {
         //spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         spriteBatch.end();
 
-        box2DDebugRenderer.render(world, camera.combined);
-
-
-       // fhGame.spriteBatch.setProjectionMatrix(camera.combined);
+         //box2DDebugRenderer.render(world, camera.combined);
 
 
         spriteBatch.setProjectionMatrix( playScreenUI.stage.getCamera().combined);
 
-
-
-
         playScreenUI.stage.act(delta);
-
         playScreenUI.stage.draw();
 
     }
+
 
     public void pauseGame(){
        pauseGame=true;
@@ -324,16 +364,55 @@ public class PlayScreen implements Screen {
 
     public void addScorePlayerBot() {
         scorePlayerBot++;
-        System.out.println(scorePlayerBot);
-        scoreBottom=true;
-        playScreenUI.showGoalBottomPlayer();
+        if( scorePlayerBot==2){
+            playScreenUI.showWinBottomPlayer();
+            playScreenUI.showLoseTopPlayer();
+
+        }
+        else{
+            playScreenUI.showGoalBottomPlayer();
+            isGoal=true;
+
+
+        }
+
+    }
+    public void addScorePlayerTop() {
+        scorePlayerTop++;
+        if(scorePlayerTop==2){
+            playScreenUI.showWinTopPlayer();
+            playScreenUI.showLoseBottomPlayer();
+
+        }
+        else{
+            playScreenUI.showGoalTopPlayer();
+            isGoal=true;
+
+        }
+
 
     }
 
-    public void addScorePlayerTop() {
-        scorePlayerTop++;
-        System.out.println(scorePlayerTop);
+    public void reset(){
+        world.clearForces();
+        counter=0;
+        getPuck().resetPuck();
+        isGoal=false;
+        toggle=true;
+        getRandomAngle();
+    }
 
+    public void getRandomAngle(){
+        int i = MathUtils.random(0,1);
+        System.out.println(i);
+        switch (i){
+            case 0:
+                rand=  MathUtils.random(-60,60)*MathUtils.degreesToRadians;
+                break;
+            case 1:
+                rand=  MathUtils.random(120,240)*MathUtils.degreesToRadians;
+                break;
+        }
 
     }
 

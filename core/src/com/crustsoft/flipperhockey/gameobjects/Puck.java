@@ -45,7 +45,8 @@ public class Puck   extends Sprite{
 
 
          bdefPuck = new BodyDef();
-        bdefPuck.type= BodyDef.BodyType.DynamicBody;
+        bdefPuck.type= BodyDef.BodyType.KinematicBody;
+        //bdefPuck.type= BodyDef.BodyType.DynamicBody;
         bdefPuck.bullet=true;
         bdefPuck.position.set(x / FHGame.PPM, y / FHGame.PPM);
 
@@ -69,10 +70,22 @@ public class Puck   extends Sprite{
         bodyPuck.createFixture(fdefPuck);
 
     }
-    public void resetPuck(){
+    public void setDynamic(){
+        bdefPuck.type=BodyDef.BodyType.DynamicBody;
+
+    }
+    /*public void resetPuck(){
         world.destroyBody(bodyPuck);
         definePuck();
+    }*/
+       public void resetPuck(){
+        bodyPuck.setLinearVelocity(0,0);
+           bodyPuck.setAngularVelocity(0);
+           bodyPuck.setTransform(x / FHGame.PPM, y / FHGame.PPM,0);
+
+           //definePuck();
     }
+
     public void setTexturePuck(){
         setRegion(puckreg);
 
@@ -101,6 +114,11 @@ public class Puck   extends Sprite{
         setRotation(a);
 
 
+
+    }
+
+    public Body getPuckBody(){
+        return bodyPuck;
     }
 
 

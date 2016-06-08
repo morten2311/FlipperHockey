@@ -13,14 +13,11 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -30,8 +27,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.crustsoft.flipperhockey.game.FHGame;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 /**
  * Created by Morten on 18.04.2016.
@@ -46,12 +41,12 @@ public class PlayScreenUI implements Disposable {
     Button pauseButton;
     Texture pause;
     Button.ButtonStyle buttonStyle;
-    Label scoreTopLabel,scoreBottomLabel, goalLabel, winnerLabel;
+    Label scoreTopLabel,scoreBottomLabel, goalLabelBottom,goalLabelTop, winnerLabel,loserLabel;
     Label.LabelStyle labelStyle;
     private BitmapFont fontUp, fontDown;
-    public Container containerGoal;
-    Actions actions;
-    Action action;
+    public Container containerGoalBottom,containerGoalTop, containerLose, containerWin;
+
+
 
     PlayScreen playScreen;
     public PlayScreenUI(SpriteBatch batch, final PlayScreen playScreen) {
@@ -71,16 +66,33 @@ public class PlayScreenUI implements Disposable {
         labelStyle = new Label.LabelStyle();
         labelStyle.font=fontUp;
 
-        goalLabel = new Label("GOAL!",labelStyle);
+        goalLabelBottom = new Label("GOAL!",labelStyle);
+        goalLabelTop = new Label("GOAL!",labelStyle);
+        winnerLabel = new Label("YOU WIN!",labelStyle);
+        loserLabel = new Label("YOU LOSE!",labelStyle);
+
         scoreTopLabel = new Label(playScreen.getScorePlayerTop()+"",labelStyle);
         scoreBottomLabel = new Label(playScreen.getScorePlayerBot()+"", labelStyle);
         Container containerBottom = new Container(scoreBottomLabel);
         Container containerTop = new Container(scoreTopLabel);
-        containerGoal = new Container(goalLabel);
-        containerGoal.setTransform(true);
-       // containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(1),Actions.rotateBy(360,1f)),Actions.parallel(Actions.rotateBy(-360,1f),Actions.fadeOut(1))));
-        containerGoal.setVisible(false);
-        //containerGoal.addAction(Actions.rotateBy(-360,2f));
+        containerGoalTop = new Container(goalLabelTop);
+        containerGoalBottom = new Container(goalLabelBottom);
+        containerLose= new Container(loserLabel);
+        containerWin =new Container(winnerLabel);
+
+        containerWin.setTransform(true);
+        containerLose.setTransform(true);
+        containerLose.setVisible(false);
+        containerWin.setVisible(false);
+
+        containerGoalBottom.setTransform(true);
+       // containerGoalBottom.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(1),Actions.rotateBy(360,1f)),Actions.parallel(Actions.rotateBy(-360,1f),Actions.fadeOut(1))));
+        containerGoalBottom.setVisible(false);
+        //containerGoalBottom.addAction(Actions.rotateBy(-360,2f));
+        containerGoalTop.setTransform(true);
+        containerGoalTop.setVisible(false);
+        containerGoalTop.rotateBy(180);
+
 
 
 
@@ -93,10 +105,12 @@ public class PlayScreenUI implements Disposable {
         containerTop.setPosition(FHGame.LOGICAL_V_WIDTH-100,FHGame.LOGICAL_V_HEIGHT/2+100);
         containerTop.rotateBy(-90);
 
-        //stage.addActor(containerGoal);
         stage.addActor(containerBottom);
         stage.addActor(containerTop);
-        stage.addActor(containerGoal);
+        stage.addActor(containerGoalBottom);
+        stage.addActor(containerGoalTop);
+        stage.addActor(containerLose);
+        stage.addActor(containerWin);
 
         pauseButton.setPosition((FHGame.LOGICAL_V_WIDTH)-pauseButton.getWidth()*1.5f,(FHGame.LOGICAL_V_HEIGHT/2)-pauseButton.getHeight()/2);
 
@@ -166,9 +180,6 @@ public class PlayScreenUI implements Disposable {
             }
         });
 
-
-
-
         Window.WindowStyle windowStyle = new Window.WindowStyle();
         windowStyle.stageBackground = createDrawable(new Color(0,0,0,0.6f));
         windowStyle.titleFont=fontDown;
@@ -194,28 +205,72 @@ public class PlayScreenUI implements Disposable {
         //dialog.align(Align.top|Align.center);
 
     }
-    public void showGoalTopPlayer(){
-        containerGoal.setPosition(320,720);
 
-        containerGoal.setVisible(true);
-        containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.8f),Actions.rotateBy(360,0.8f))
-                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f))));
 
-    }
+
     public void showGoalBottomPlayer(){
-        containerGoal.setPosition(320,360);
+        containerGoalBottom.setPosition(320,360);
 
-        containerGoal.setVisible(true);
-        containerGoal.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.8f),Actions.rotateBy(360,0.8f))
-                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f))));
+        containerGoalBottom.setVisible(true);
+        containerGoalBottom.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))
+                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f)),Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        playScreen.reset();
+                    }
+                })));
+
 
     }
-    public void showWinTopPlayer(){
+    public void showLoseBottomPlayer(){
+        containerLose.setPosition(320,360);
+
+        containerLose.setVisible(true);
+        containerLose.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));
+
 
     }
     public void showWinBottomPlayer(){
+        containerWin.setPosition(320,360);
+
+        containerWin.setVisible(true);
+        containerWin.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));
+
 
     }
+
+    public void showGoalTopPlayer(){
+        containerGoalTop.setPosition(320,720);
+
+        containerGoalTop.setVisible(true);
+        containerGoalTop.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.8f),Actions.rotateBy(360,0.5f))
+                ,Actions.delay(0.3f),Actions.parallel(Actions.rotateBy(-360,0.5f),Actions.fadeOut(0.5f)),Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        playScreen.reset();
+                    }
+                })));
+
+    }
+    public void showLoseTopPlayer(){
+        containerLose.setPosition(320,720);
+
+
+        containerLose.setVisible(true);
+        containerLose.addAction(Actions.rotateBy(180));
+
+        containerLose.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));
+    }
+    public void showWinTopPlayer(){
+        containerWin.setPosition(320,720);
+
+
+        containerWin.setVisible(true);
+        containerWin.addAction(Actions.rotateBy(180));
+        containerWin.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));
+
+    }
+
     public void pauseGame(){
         playScreen.pauseGame();
     }
@@ -230,5 +285,6 @@ public class PlayScreenUI implements Disposable {
     public void dispose() {
 
     }
+
 
 }

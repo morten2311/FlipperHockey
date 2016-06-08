@@ -69,6 +69,9 @@ public class InputHandler implements InputProcessor {
         }
         if( keycode== Input.Keys.SPACE) {
             playScreen.getPuck().resetPuck();
+            playScreen.toggle=true;
+            playScreen.counter= 0;
+            playScreen.getRandomAngle();
             return true;
         }
 
