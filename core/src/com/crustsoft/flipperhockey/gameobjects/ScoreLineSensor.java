@@ -12,12 +12,13 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.crustsoft.flipperhockey.game.FHGame;
+import com.crustsoft.flipperhockey.helpers.AssetLoader;
 import com.crustsoft.flipperhockey.screens.PlayScreen;
 
 /**
  * Created by Morten on 28.03.2016.
  */
-public class ScoreLineSensor  extends Sprite{
+public class ScoreLineSensor extends Sprite {
     private World world;
     private Body body;
     private BodyDef bodyDef;
@@ -27,22 +28,18 @@ public class ScoreLineSensor  extends Sprite{
     float x;
     float y;
 
-    Texture scoreline, scorelineGlow;
-    TextureRegion scorelineRegion,scorelineGlowRegion;
+    TextureRegion scorelineRegion, scorelineGlowRegion;
 
-    public ScoreLineSensor(PlayScreen playScreen,boolean top,float x, float y) {
-        scoreline= new Texture("scoreline.png");
-        scorelineGlow = new Texture("scorelineGlow.png");
-        scoreline.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        scorelineGlow.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        scorelineGlowRegion = new TextureRegion(scorelineGlow,0,0,scorelineGlow.getWidth(),scorelineGlow.getHeight());
-        scorelineRegion = new TextureRegion(scoreline,0,0,scoreline.getWidth(),scoreline.getHeight());
+    public ScoreLineSensor(PlayScreen playScreen, boolean top, float x, float y) {
 
-        this.top=top;
+        scorelineGlowRegion = AssetLoader.scorelineGlowRegion;
+        scorelineRegion = AssetLoader.scorelineRegion;
+
+        this.top = top;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.x=x;
-        this.y=y;
+        this.x = x;
+        this.y = y;
         defineScoreLineSensor();
     }
 
@@ -50,23 +47,22 @@ public class ScoreLineSensor  extends Sprite{
     public void defineScoreLineSensor() {
 
         bodyDef = new BodyDef();
-        bodyDef.type= BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x / FHGame.PPM, y/FHGame.PPM);
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(x / FHGame.PPM, y / FHGame.PPM);
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox((200)/FHGame.PPM,(10)/FHGame.PPM);
+        polygonShape.setAsBox((200) / FHGame.PPM, (10) / FHGame.PPM);
 
         FixtureDef fdefScoreLine = new FixtureDef();
-        fdefScoreLine.shape=polygonShape;
-        fdefScoreLine.isSensor=true;
-        if(top){
-            fdefScoreLine.filter.categoryBits=FHGame.BIT_GOAL_TOP;
+        fdefScoreLine.shape = polygonShape;
+        fdefScoreLine.isSensor = true;
+        if (top) {
+            fdefScoreLine.filter.categoryBits = FHGame.BIT_GOAL_TOP;
+        } else {
+            fdefScoreLine.filter.categoryBits = FHGame.BIT_GOAL_BOT;
         }
-        else {
-            fdefScoreLine.filter.categoryBits=FHGame.BIT_GOAL_BOT;
-        }
-        fdefScoreLine.filter.maskBits=FHGame.BIT_PUCK;
+        fdefScoreLine.filter.maskBits = FHGame.BIT_PUCK;
 
-        body =world.createBody(bodyDef);
+        body = world.createBody(bodyDef);
         body.createFixture(fdefScoreLine).setUserData(this);
 
     }
@@ -74,19 +70,20 @@ public class ScoreLineSensor  extends Sprite{
     public PlayScreen getPlayScreen() {
         return playScreen;
     }
-    public void setTextureScoreLine(){
+
+    public void setTextureScoreLine() {
         setRegion(scorelineRegion);
 
 
-
     }
-    public void setTextureGlow(){
+
+    public void setTextureGlow() {
         setRegion(scorelineGlowRegion);
 
 
     }
 
-    public void update(){
+    public void update() {
         Vector2 position = body.getPosition();
         // Center body is center sprite here
         float hw = getWidth() / 2.0f;
@@ -95,7 +92,7 @@ public class ScoreLineSensor  extends Sprite{
         float x = position.x - hw;
         float y = position.y - hh;
 
-        setBounds(x/FHGame.PPM,x,scorelineRegion.getRegionWidth()/FHGame.PPM,scorelineRegion.getRegionHeight()/FHGame.PPM);
+        setBounds(x / FHGame.PPM, x, scorelineRegion.getRegionWidth() / FHGame.PPM, scorelineRegion.getRegionHeight() / FHGame.PPM);
 
         setPosition(x, y);
     }

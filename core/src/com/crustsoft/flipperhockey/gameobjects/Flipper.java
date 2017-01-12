@@ -16,19 +16,20 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.crustsoft.flipperhockey.game.FHGame;
+import com.crustsoft.flipperhockey.helpers.AssetLoader;
 import com.crustsoft.flipperhockey.screens.PlayScreen;
 
 /**
  * Created by Morten on 01.03.2016.
  */
-public abstract class Flipper extends Sprite{
+public abstract class Flipper extends Sprite {
     Vector2[] vertices;
     // BodyDef bdefStartC, bdefEndC, bdefPoly, bdefFlipper;
     Body bodyFlipper, bodyStartC;
     public World world;
     public PlayScreen playScreen;
     public RevoluteJoint joint;
-
+    float restitutions = 0.1f;
     protected float xPos;
     protected float yPos;
     protected float flipperLength;
@@ -36,37 +37,33 @@ public abstract class Flipper extends Sprite{
     private float lowerAngle;
     CircleShape circleStart;
 
-    protected float circleStart_radius=18f;
-    protected float circleEnd_radius=12f;
+    protected float circleStart_radius = 18f;
+    protected float circleEnd_radius = 12f;
     private float density;
     float motorSpeed;
     float maxMotorTorque;
 
-    Texture flipper, flipperGlow;
     TextureRegion flipperRegion, flipperGlowRegion;
 
 
-    public Flipper(PlayScreen playScreen, float xPos, float yPos,float motorSpeed,boolean left) {
-        flipper = new Texture("flipper.png");
-        flipperGlow= new Texture("flipperGlow.png");
-        flipperGlow.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-        flipperGlowRegion = new TextureRegion(flipperGlow,0,0,flipper.getWidth(),flipper.getHeight());
-        flipperRegion = new TextureRegion(flipper,0,0,flipper.getWidth(),flipper.getHeight());
-        flipper.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    public Flipper(PlayScreen playScreen, float xPos, float yPos, float motorSpeed, boolean left) {
+
+        flipperGlowRegion = AssetLoader.flipperGlowRegion;
+        flipperRegion = AssetLoader.flipperRegion;
+
         this.xPos = xPos;
         this.yPos = yPos;
         this.upperAngle = 17;
         this.lowerAngle = -17;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.density=10f;
-        this.maxMotorTorque=500;
-        this.motorSpeed=motorSpeed;
-        if(left){
-            flipperLength=118;
-        }
-        else {
-            flipperLength=-118;
+        this.density = 20f;
+        this.maxMotorTorque = 1000;
+        this.motorSpeed = motorSpeed;
+        if (left) {
+            flipperLength = 118;
+        } else {
+            flipperLength = -118;
         }
 
     }
@@ -84,7 +81,7 @@ public abstract class Flipper extends Sprite{
         bodyFlipper.setBullet(true);
 
         //CircleStart
-         circleStart = new CircleShape();
+        circleStart = new CircleShape();
 
         circleStart.setRadius(circleStart_radius / FHGame.PPM);
         BodyDef bdefStartC = new BodyDef();
@@ -92,18 +89,17 @@ public abstract class Flipper extends Sprite{
         bdefStartC.type = BodyDef.BodyType.StaticBody;
         FixtureDef fDefStartC = new FixtureDef();
         fDefStartC.shape = circleStart;
-        fDefStartC.restitution=0.2f;
+        fDefStartC.restitution = restitutions;
 
         bodyStartC = world.createBody(bdefStartC);
         bodyStartC.createFixture(fDefStartC);
-        circleStart.dispose();
 
         //CircleEnd
         CircleShape circleEnd = new CircleShape();
         circleEnd.setRadius(circleEnd_radius / FHGame.PPM);
         circleEnd.setPosition(new Vector2(flipperLength / FHGame.PPM, 0));
         FixtureDef fDefEndC = new FixtureDef();
-        fDefEndC.restitution=0.2f;
+        fDefEndC.restitution = restitutions;
         fDefEndC.shape = circleEnd;
 
         //Polygon
@@ -113,22 +109,23 @@ public abstract class Flipper extends Sprite{
         fDefPoly.shape = polygonShape;
         bodyFlipper.createFixture(fDefPoly);
         fDefPoly.density = density;
-        fDefPoly.restitution=0.2f;
+        fDefPoly.restitution = restitutions;
 
 
         //Create fixtures
         bodyFlipper.createFixture(fDefEndC);
         bodyFlipper.createFixture(fDefPoly);
         //Set filter
-        for(Fixture fixture: bodyFlipper.getFixtureList()){
+        for (Fixture fixture : bodyFlipper.getFixtureList()) {
             Filter filter = fixture.getFilterData();
-            filter.categoryBits=FHGame.BIT_FLIPPER;
-            filter.maskBits=FHGame.BIT_PUCK;
+            filter.categoryBits = FHGame.BIT_FLIPPER;
+            filter.maskBits = FHGame.BIT_PUCK;
             fixture.setFilterData(filter);
 
         }
 
         //dispose
+        circleStart.dispose();
         polygonShape.dispose();
         circleEnd.dispose();
 
@@ -147,20 +144,16 @@ public abstract class Flipper extends Sprite{
         joint = (RevoluteJoint) world.createJoint(revoluteJointDef);
 
 
-
     }
-    public void setTextureFlipper(){
+
+    public void setTextureFlipper() {
         setRegion(flipperRegion);
-
-
-
     }
 
-    public void setTextureGlow(){
+    public void setTextureGlow() {
         setRegion(flipperGlowRegion);
-
-
     }
+
     public abstract void update();
 
 }

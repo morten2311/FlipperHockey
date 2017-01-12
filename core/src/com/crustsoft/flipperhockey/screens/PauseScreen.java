@@ -35,7 +35,9 @@ public class PauseScreen implements Screen {
     public PauseScreen(final FHGame fhGame, final Screen parent) {
         this.parent = parent;
         this.fhGame = fhGame;
-        this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH,FHGame.LOGICAL_V_HEIGHT));
+        this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH, FHGame.LOGICAL_V_HEIGHT));
+
+        show();
 
         atlas = new TextureAtlas("buttons.pack");
         textButtons = new Array<TextButton>();
@@ -44,20 +46,15 @@ public class PauseScreen implements Screen {
         final TextButton.TextButtonStyle style = new TextButton.TextButtonStyle(); //** Button properties **//
         style.up = skin.getDrawable("buttonUp");
         style.down = skin.getDrawable("buttonDown");
-        fontDown= new BitmapFont(Gdx.files.internal("fonts/fontDown-export2x.fnt"),false);
-        fontUp = new BitmapFont(Gdx.files.internal("fonts/fontUp-export2x.fnt"),false);
+        fontDown = new BitmapFont(Gdx.files.internal("fonts/fontDown-export2x.fnt"), false);
+        fontUp = new BitmapFont(Gdx.files.internal("fonts/fontUp-export2x.fnt"), false);
         fontUp.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         style.font = fontUp;
 
-
-//        this.skin= new Skin((Gdx.files.internal("uiskin.json")));
-
-
-        System.out.println(stage.getWidth());
         table = new Table();
         table.setWidth(stage.getWidth());
-        table.align(Align.center| Align.top);
-        table.setPosition(0,FHGame.LOGICAL_V_HEIGHT);
+        table.align(Align.center | Align.top);
+        table.setPosition(0, FHGame.LOGICAL_V_HEIGHT);
 
         exitButton = new TextButton("RESUME", style);
         resumeButton = new TextButton("EXIT", style);
@@ -65,28 +62,28 @@ public class PauseScreen implements Screen {
 
         textButtons.add(resumeButton);
         textButtons.add(exitButton);
-
-        table.padTop(FHGame.LOGICAL_V_HEIGHT/8);
-        for (final TextButton textButton: textButtons){
-            textButton.addListener(new ClickListener(){
+        table.padTop(FHGame.LOGICAL_V_HEIGHT / 8);
+        for (final TextButton textButton : textButtons) {
+            textButton.addListener(new ClickListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    style.font=fontDown;
+                    style.font = fontDown;
                     textButton.setStyle(style);
+                    System.out.println("pushdown");
                     return true;
                 }
 
                 @Override
                 public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                    style.font=fontUp;
+                    style.font = fontUp;
                     textButton.setStyle(style);
-                    if(isOver()){
-                    if(textButton.getText().toString().equals("RESUME")){
+                    if (isOver()) {
+                        if (textButton.getText().toString().equals("RESUME")) {
+                            System.out.println("PushUp");
 
-
-                        fhGame.setScreen(parent);
-                        dispose();
-                    }
+                            fhGame.setScreen(parent);
+                            dispose();
+                        }
 
                     }
 
@@ -95,11 +92,7 @@ public class PauseScreen implements Screen {
 
             table.add(textButton);
             table.row();
-
-
         }
-
-
         stage.addActor(table);
     }
 
@@ -121,8 +114,7 @@ public class PauseScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width,height);
-
+        stage.getViewport().update(width, height);
 
 
     }

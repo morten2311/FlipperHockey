@@ -50,7 +50,9 @@ public class PlayScreenUI implements Disposable {
 
     PlayScreen playScreen;
     public PlayScreenUI(SpriteBatch batch, final PlayScreen playScreen) {
+        //this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH,FHGame.LOGICAL_V_HEIGHT,new OrthographicCamera()));
         this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH,FHGame.LOGICAL_V_HEIGHT,new OrthographicCamera()));
+        stage.getCamera().position.set(FHGame.LOGICAL_V_WIDTH /2, FHGame.LOGICAL_V_HEIGHT/2,0);
         this.playScreen = playScreen;
         pause = new Texture("buttons/pause.png");
         pause.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -92,10 +94,6 @@ public class PlayScreenUI implements Disposable {
         containerGoalTop.setTransform(true);
         containerGoalTop.setVisible(false);
         containerGoalTop.rotateBy(180);
-
-
-
-
 
         containerBottom.setTransform(true);
         containerBottom.setPosition(FHGame.LOGICAL_V_WIDTH-100,FHGame.LOGICAL_V_HEIGHT/2-100);
@@ -149,32 +147,27 @@ public class PlayScreenUI implements Disposable {
 
         exitButton = new TextButton("EXIT", style);
         resumeButton = new TextButton("RESUME", style);
-
+        stage.addActor(exitButton);
+        stage.addActor(resumeButton);
         resumeButton.addListener(new ClickListener(){
-
-
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                if(isOver()){
 
-                System.out.println("pressed");
                 dialog.hide();
                 playScreen.resumeGame();
-                }
+
 
             }
         });
-        exitButton.addListener(new ClickListener(){
 
+
+        exitButton.addListener(new ClickListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                if( isOver()){
                 playScreen.getFhGame().setScreen(playScreen.getParent());
-
-                }
 
 
             }
