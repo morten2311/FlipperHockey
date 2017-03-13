@@ -216,7 +216,7 @@ public class PlayScreenUI implements Disposable {
 
     }
     public void showLoseBottomPlayer(){
-        containerLose.setPosition(320,360);
+        containerLose.setPosition(320,240);
 
         containerLose.setVisible(true);
         containerLose.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));
@@ -224,7 +224,7 @@ public class PlayScreenUI implements Disposable {
 
     }
     public void showWinBottomPlayer(){
-        containerWin.setPosition(320,360);
+        containerWin.setPosition(320,240);
 
         containerWin.setVisible(true);
         containerWin.addAction(Actions.sequence(Actions.parallel(Actions.alpha(0),Actions.fadeIn(0.6f),Actions.rotateBy(360,0.5f))));

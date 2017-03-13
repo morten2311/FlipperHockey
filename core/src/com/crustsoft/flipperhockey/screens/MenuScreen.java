@@ -59,7 +59,6 @@ public class MenuScreen implements Screen {
 
 
         }
-
         this.fhGame = fhGame;
         //this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH, FHGame.LOGICAL_V_HEIGHT,new OrthographicCamera()));
         this.stage = new Stage(new ExtendViewport(FHGame.LOGICAL_V_WIDTH, FHGame.LOGICAL_V_HEIGHT, new OrthographicCamera()));
@@ -67,7 +66,6 @@ public class MenuScreen implements Screen {
 
         scorelineBot = new Texture("StartMenu/scoreline.png");
         gameTitle = new Texture("titleMedium.png");
-        //gameTitle = new Texture("titlelarge.png");
         flippLeft = new Texture("flippgreen.png");
         flippRight = new Texture("flippRight.png");
         gameTitle.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
@@ -100,15 +98,12 @@ public class MenuScreen implements Screen {
         table.setPosition(0, 0);
         table.setFillParent(true);
         twoPlayerButton = new TextButton("PLAY", style);
-        //onePlayerButton = new TextButton("ONE PLAYER", style);
-        //settingsButton = new TextButton("SETTINGS", style);
+
         exitButton = new TextButton("EXIT", style);
 
 
-        //textButtons.add(multiplayerButton);
-        //textButtons.add(onePlayerButton);
+
         textButtons.add(twoPlayerButton);
-        //textButtons.add(settingsButton);
         textButtons.add(exitButton);
 
         for (final TextButton textButton : textButtons) {

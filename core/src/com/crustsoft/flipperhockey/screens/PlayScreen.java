@@ -45,7 +45,7 @@ public class PlayScreen implements Screen {
     public boolean pauseGame = false;
     public boolean scoreBottom = false;
     public boolean scoreTop = false;
-
+    private float gravitation = 2f;
 
     private InputHandler inputHandler;
     public World world;
@@ -72,7 +72,7 @@ public class PlayScreen implements Screen {
     public PlayScreenUI playScreenUI;
     InputMultiplexer inputMultiplexer;
     public static Sound cling, flipper;
-    private float speed = 2.5f;
+    private float speed = 3f;
     public int counter = 0;
     ParticleEffect particleEffectBottom, particleEffectTop;
 
@@ -140,11 +140,11 @@ public class PlayScreen implements Screen {
     public void update(float delta) {
 
         if (puck.bodyPuck.getPosition().y > (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, 2.5f));
+            world.setGravity(new Vector2(0, gravitation));
 
         }
         if (puck.bodyPuck.getPosition().y < (FHGame.LOGICAL_V_HEIGHT / 2) / FHGame.PPM) {
-            world.setGravity(new Vector2(0, -2.5f));
+            world.setGravity(new Vector2(0, -gravitation));
 
         }
         if (counter < 50) {
@@ -179,8 +179,6 @@ public class PlayScreen implements Screen {
         scoreLineSensorBottom.update();
         scoreLineSensorTop.update();
         playScreenUI.update(delta);
-
-
     }
 
     @Override
@@ -198,12 +196,9 @@ public class PlayScreen implements Screen {
 
         if (!pauseGame) {
             update(delta);
-
-
         }
         camera.update();
         // playScreenUI.stage.getCamera().update();
-
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -214,28 +209,20 @@ public class PlayScreen implements Screen {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
-
-        // shapeRenderer.setColor(Color.BROWN);
         shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.rect(rectangle2.getX() / FHGame.PPM, rectangle2.getY() / FHGame.PPM, rectangle2.getWidth() / FHGame.PPM, rectangle2.getHeight() / FHGame.PPM);
         shapeRenderer.setColor(Color.BLACK);
         shapeRenderer.rect(rectangle.getX() / FHGame.PPM, rectangle.getY() / FHGame.PPM, rectangle.getWidth() / FHGame.PPM, rectangle.getHeight() / FHGame.PPM);
         shapeRenderer.setColor(Color.GREEN);
-
-
         shapeRenderer.end();
 
 
-        spriteBatch.begin();
-
-
         //Markers
+        spriteBatch.begin();
         spriteBatch.draw(markers, 58 / FHGame.PPM, 151.5f / FHGame.PPM, markers.getWidth() / FHGame.PPM, markers.getHeight() / fhGame.PPM);
         spriteBatch.end();
         spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
         spriteBatch.begin();
-
-        //spriteBatch.enableBlending();
 
         //Glow
         spriteBatch.setColor(Color.BLUE);

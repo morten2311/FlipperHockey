@@ -52,8 +52,8 @@ public class Puck extends Sprite {
         FixtureDef fdefPuck = new FixtureDef();
 
         fdefPuck.shape = CirclePuck;
-        fdefPuck.density = 1f;
-        fdefPuck.restitution = 0.4f;
+        fdefPuck.density = 0.1f;
+        fdefPuck.restitution = 0.3f;
         fdefPuck.friction = 0.0f;
         fdefPuck.filter.categoryBits = FHGame.BIT_PUCK;
         fdefPuck.filter.maskBits = FHGame.BIT_CONTAINER | FHGame.BIT_FLIPPER | FHGame.BIT_GOAL_BOT | FHGame.BIT_GOAL_TOP;

@@ -30,6 +30,7 @@ public class B2DContactListener implements ContactListener {
 
                 }
                 break;
+
             case FHGame.BIT_PUCK|FHGame.BIT_GOAL_TOP:
                 if(fixA.getFilterData().categoryBits == FHGame.BIT_GOAL_TOP){
                     ((ScoreLineSensor) fixA.getUserData()).getPlayScreen().addScorePlayerBot();
@@ -39,6 +40,7 @@ public class B2DContactListener implements ContactListener {
 
                 }
                 break;
+
             case FHGame.BIT_PUCK|FHGame.BIT_CONTAINER:
 
                 break;

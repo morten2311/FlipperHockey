@@ -22,6 +22,7 @@ import aurelienribon.bodyeditor.BodyEditorLoader;
 
 public class FieldContainer extends Sprite {
     private World world;
+    private float restitution = 0.0f;
 
     public FieldContainer(PlayScreen playScreen) {
         world = playScreen.world;
@@ -48,10 +49,12 @@ public class FieldContainer extends Sprite {
 
         // 2. Create a FixtureDef, as usual.
         FixtureDef fdLeftContainer = new FixtureDef();
-        fdLeftContainer.restitution = 0.1f;
+        fdLeftContainer.restitution = restitution;
+        fdLeftContainer.friction = 0f;
 
         FixtureDef fdRightContainer = new FixtureDef();
-        fdRightContainer.restitution = 0.1f;
+        fdRightContainer.restitution = restitution;
+        fdRightContainer.friction = 0.0f;
 
         fdLeftContainer.filter.categoryBits = FHGame.BIT_CONTAINER;
         fdRightContainer.filter.categoryBits = FHGame.BIT_CONTAINER;

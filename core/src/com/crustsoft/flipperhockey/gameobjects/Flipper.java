@@ -29,7 +29,7 @@ public abstract class Flipper extends Sprite {
     public World world;
     public PlayScreen playScreen;
     public RevoluteJoint joint;
-    float restitutions = 0.1f;
+    float restitutions = 0f;
     protected float xPos;
     protected float yPos;
     protected float flipperLength;
@@ -57,8 +57,8 @@ public abstract class Flipper extends Sprite {
         this.lowerAngle = -17;
         this.playScreen = playScreen;
         this.world = playScreen.world;
-        this.density = 20f;
-        this.maxMotorTorque = 1000;
+        this.density = 3.5f;
+        this.maxMotorTorque = 300;
         this.motorSpeed = motorSpeed;
         if (left) {
             flipperLength = 118;
