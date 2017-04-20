@@ -19,7 +19,7 @@ public class AssetLoader {
 
     private static TextureAtlas atlas;
     public static Preferences prefs;
-    public static Sound cling, button, goal, win, bump, airhorn, buttonPressedSound;
+    public static Sound cling, button, goal, win, bump, airhorn, buttonPressedSound, music;
     public static Texture flipper, flipperGlow, puck, puckGlow, scoreline, scorelineGlow;
     public static TextureRegion flipperRegion, flipperGlowRegion, puckreg, puckGlowreg, scorelineRegion,scorelineGlowRegion;
     public static Texture gameTitle, bg, flippLeft,flippRight, scorelineBot;
@@ -34,6 +34,8 @@ public class AssetLoader {
         bump = Gdx.audio.newSound(Gdx.files.internal("sounds/bump.wav"));
         airhorn = Gdx.audio.newSound(Gdx.files.internal("sounds/airhorn2.wav"));
         buttonPressedSound = Gdx.audio.newSound(Gdx.files.internal("sounds/button.wav"));
+        music = Gdx.audio.newSound(Gdx.files.internal("sounds/music.mp3"));
+
 
 
         //textures

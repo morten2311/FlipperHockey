@@ -32,6 +32,10 @@ public class FHGame extends Game {
         spriteBatch = new SpriteBatch();
         AssetLoader.load();
         setScreen(new MenuScreen(this));
+
+        AssetLoader.music.play(0.1f);
+
+
         //setScreen(new PlayScreen(this));
     }
 
